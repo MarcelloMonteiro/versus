@@ -31,6 +31,19 @@ const OrderDetailsPage: React.FC = () => {
     }
   };
 
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Pendente';
+      case 'em_preparacao':
+        return 'Em Preparação';
+      case 'concluido':
+        return 'Concluído';
+      default:
+        return status;
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-4">
@@ -55,6 +68,8 @@ const OrderDetailsPage: React.FC = () => {
     );
   }
 
+  const isButtonDisabled = order.status !== 'em_preparacao';
+
   return (
     <div className="container mx-auto p-4 max-w-lg">
       <h1 className="text-3xl font-bold text-center mb-6">Detalhes do Pedido #{order.id}</h1>
@@ -64,20 +79,21 @@ const OrderDetailsPage: React.FC = () => {
         </p>
         <p className="text-lg flex items-center">
           <strong className="font-semibold">Status:</strong>
-          <span className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${
-            order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-            order.status === 'em_preparacao' ? 'bg-blue-100 text-blue-800' :
-            order.status === 'concluido' ? 'bg-green-100 text-green-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {order.status}
+          <span className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+              order.status === 'em_preparacao' ? 'bg-blue-100 text-blue-800' :
+                order.status === 'concluido' ? 'bg-green-100 text-green-800' :
+                  'bg-gray-100 text-gray-800'
+            }`}>
+            {translateStatus(order.status)}
           </span>
         </p>
 
         {order.status !== 'concluido' && (
           <button
             onClick={handleUpdateStatus}
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors font-semibold"
+            disabled={isButtonDisabled}
+            className={`w-full text-white px-4 py-2 rounded-md font-semibold ${isButtonDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 transition-colors'
+              }`}
           >
             Marcar como Concluído
           </button>

@@ -16,7 +16,9 @@ const useOrderPolling = (orderId: string | string[] | undefined): UseOrderPollin
 
   const fetchOrder = async (id: string) => {
     try {
-      setLoading(true);
+      if (!order) {
+        setLoading(true);
+      }
       const response = await api.get(`/orders/${id}`);
       setOrder(response.data.data);
       setError(null);
@@ -33,13 +35,27 @@ const useOrderPolling = (orderId: string | string[] | undefined): UseOrderPollin
       setLoading(false);
       return;
     }
+
     const id = orderId as string;
-    fetchOrder(id);
-    const interval = setInterval(() => {
-      fetchOrder(id);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [orderId]);
+    let interval: NodeJS.Timeout | null = null;
+
+    const fetchAndUpdate = async () => {
+      await fetchOrder(id);
+      if (order?.status === 'pending' && !interval) {
+        interval = setInterval(() => {
+          fetchOrder(id);
+        }, 5000); 
+      }
+    };
+    
+    fetchAndUpdate();
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [orderId, order?.status]);
 
   return { order, loading, error, fetchOrder };
 };

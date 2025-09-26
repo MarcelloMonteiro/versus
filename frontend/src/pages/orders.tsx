@@ -11,6 +11,19 @@ const Spinner: React.FC = () => (
   </div>
 );
 
+const translateStatus = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'Pendente';
+    case 'em_preparacao':
+      return 'Em Preparação';
+    case 'concluido':
+      return 'Concluído';
+    default:
+      return status;
+  }
+};
+
 const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +48,7 @@ const OrdersPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6">Lista de Pedidos</h1>
-      
+
       {loading ? (
         <Spinner />
       ) : error ? (
@@ -53,13 +66,11 @@ const OrdersPage: React.FC = () => {
                       <span className="font-semibold text-lg">Pedido #{order.id}</span>
                       <p className="text-gray-600">Cliente: {order.client}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      order.status === 'em_preparacao' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'concluido' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status}
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        order.status === 'em_preparacao' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                      }`}>
+                      {translateStatus(order.status)}
                     </span>
                   </div>
                 </Link>
