@@ -37,7 +37,7 @@ Para rodar este projeto localmente, você precisa ter instalado:
 
 ---
 
-## ▶️ Como Rodar o Projeto Localmente com Docker
+## Como Rodar o Projeto Localmente com Docker
 
 1. **Clone o repositório:**
 
