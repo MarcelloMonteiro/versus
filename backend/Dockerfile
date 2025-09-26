@@ -1,14 +1,23 @@
 FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
-    libpq-dev zip unzip git curl && \
+    libpq-dev zip unzip git curl supervisor && \
     docker-php-ext-install pdo pdo_pgsql
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY . .
-RUN composer install
+COPY composer.json composer.lock ./
 
-CMD bash -c "php artisan migrate --force && php artisan queue:work --sleep=3 --tries=3 & php artisan serve --host=0.0.0.0 --port=8000"
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+COPY . .
+
+RUN composer run-script post-autoload-dump
+
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
